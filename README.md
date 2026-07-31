@@ -1,4 +1,4 @@
-# Pick
+# Pick ![logo](icon32.png)
 
 **Change a website by clicking the thing you want changed.**
 
@@ -24,22 +24,15 @@ extension (so you can pick).
 npx skills add <owner>/<repo>@pick -g
 ```
 
-**2. The extension** — one click, once. The skill folder *is* the extension.
+**2. The extension**
 
 - **Chrome / Edge / Brave / Arc** — `chrome://extensions` → enable
   **Developer mode** → **Load unpacked** → select the skill's folder.
-  Stays installed across restarts.
-- **Firefox** — `about:debugging#/runtime/this-firefox` → **Load Temporary
-  Add-on** → select `manifest.json` in that folder. Firefox 121+.
-  Heads up: Firefox drops temporary add-ons on restart, so this is a
-  per-session load unless the extension is signed through addons.mozilla.org.
-
+  
 Ask your agent for the folder path — it differs between a global and a
 project install.
 
-Then press the toolbar button or **Alt+Shift+K** on any page. If that shortcut
-is taken, `chrome://extensions/shortcuts` lets you pick another; the toolbar
-button always works.
+Then press the toolbar button or **Alt+Shift+K** on any page. 
 
 ## The three buttons
 
@@ -62,26 +55,9 @@ server, no telemetry, no network calls at all.
 Extension **Details → Extension options** sets the accent colour, with a
 native colour picker and six presets. Saves on change; the next launch uses it.
 
-## Limitations
-
-Worth knowing before you install, not after:
-
-- **It reads the DOM, not your source.** That is why it works on any stack
-  with zero project config — and also why it hands the agent text and
-  selectors to grep rather than an exact `file:line`. Tools like LocatorJS or
-  react-dev-inspector give you the exact file, at the cost of a build plugin
-  and framework lock-in.
-- **Rendered output, not origin.** If an element's text comes from a loop or
-  a CMS field, the agent has to trace it back to the data. It is told to do
-  that, but a distinctive string helps it land in the right place.
-- **Page edits vanish on reload.** They are a preview. The clipboard log is
-  the record.
-- **One batch at a time** — the clipboard holds the most recent Done.
-
 ## Requires
 
-An agent that supports skills, e.g. Claude Code. A Chromium browser or
-Firefox 121+.
+An agent that supports skills, e.g. Claude Code and a chromium based browser, e.g. Chrome, Edge, Brave, Arc.
 
 ## License
 
