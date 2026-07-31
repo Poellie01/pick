@@ -69,12 +69,23 @@ server, no telemetry, no network calls at all.
 
 ## Options
 
-Extension **Details → Extension options** sets the accent colour, with a
-native colour picker and six presets. Saves on change; the next launch uses it.
+The accent colour is cyan by default.
+
+- **In a project** — change `DEFAULT` at the top of your `pick.js`.
+- **With the extension** — **Details → Extension options**, a native colour
+  picker plus six presets. Saves on change; the next launch uses it.
+
+## Updating
+
+`npx skills update` refreshes the skill. A project's `pick.js` is a copy, so
+it stays on the version you installed it with — ask your agent to refresh it
+when you want the newer picker.
 
 ## Requires
 
-An agent that supports skills, e.g. Claude Code and a chromium based browser, e.g. Chrome, Edge, Brave, Arc.
+An agent that supports skills, e.g. Claude Code. Any modern browser: the
+project setup is plain JavaScript. The optional extension needs Chrome, Edge,
+Brave, Arc, or Firefox 121+.
 
 ## License
 

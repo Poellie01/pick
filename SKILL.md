@@ -77,8 +77,15 @@ Each press re-fetches `pick.js`, which re-runs the picker and toggles it —
 which is why `picker.js` stays a bare IIFE with no top-level bindings. Do not
 "tidy" that into a named export.
 
-Re-running `init` must be harmless: if the project already has `pick.js` and
-the loader, say so and stop rather than adding a second copy.
+Re-running `init` must be harmless. If the project already has `pick.js` and
+the loader, do not add a second copy — instead diff the project's `pick.js`
+against this skill's `picker.js`. Identical: say it is already set up and
+stop. Different: the project is on an older picker, so offer to overwrite
+that one file. The loader tag never needs changing.
+
+The accent colour in an initialised project comes from `DEFAULT` at the top
+of its `pick.js` — there is no options page without the extension. Editing
+that constant is the whole mechanism; do not build a settings file for it.
 
 ## The extension — for pages the user does not control
 
