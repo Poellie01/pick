@@ -21,7 +21,7 @@ extension (so you can pick).
 **1. The skill**
 
 ```
-npx skills add <owner>/<repo>@pick -g
+npx skills add Poellie01/pick -g
 ```
 
 **2. The extension**
@@ -61,4 +61,4 @@ An agent that supports skills, e.g. Claude Code and a chromium based browser, e.
 
 ## License
 
-MIT
+GPL-3.0 — see [LICENSE](LICENSE).
