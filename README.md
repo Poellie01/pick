@@ -13,6 +13,8 @@ hover an element  →  ✎ Edit / 🗑 Delete / ✥ Move  →  Done  →  /pick
 The page updates instantly as a preview. Nothing is written to disk until you
 run `/pick` and the agent applies the batch to your actual source files.
 
+![The Pick toolbar over a hovered element, with one change already logged](demo.png)
+
 ## Install
 
 Two parts: the skill (so your agent knows what to do with a pick) and the
