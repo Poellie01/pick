@@ -110,7 +110,12 @@
     say('Drag to where it goes — release to drop');
 
     const move = (ev) => {
-      const t = document.elementFromPoint(ev.clientX, ev.clientY);
+      let t = document.elementFromPoint(ev.clientX, ev.clientY);
+      // ponytail: a leaf (h3, p, span) is text, not a block you drop beside —
+      // aim at its parent, so you target blocks and never land inside one.
+      // Ceiling: no dropping between two paragraphs of the same card. Walk up
+      // further only if that turns out to matter.
+      if (t && !t.firstElementChild && t.parentElement && t.parentElement !== document.body) t = t.parentElement;
       if (!t || ui.contains(t) || t === drag.src || drag.src.contains(t) || t === document.body) return;
       const r = t.getBoundingClientRect();
       drag.ref = t;
