@@ -1,16 +1,12 @@
 // Hover any element -> Edit / Delete / Move buttons. Changes preview live in
 // the page and stack up in a log; Done copies the log for Claude to apply to
-// the source. Runs as an extension content script, or pasted into the console.
-(async () => {
+// the source. Loaded by the dev-only tag `/pick init` adds, or pasted into
+// the console. Stays a bare IIFE with no top-level bindings: each press
+// re-fetches this file, and re-running it is what toggles the picker off.
+(() => {
   if (window.__picker) return window.__picker.stop();
 
-  // Accent colour from the extension's options page; the catch covers running
-  // pasted into a plain console, where there is no chrome.storage.
-  const DEFAULT = '#00f0ff';
-  const c = await new Promise((res) => {
-    try { chrome.storage.sync.get({ color: DEFAULT }, (v) => res(v.color || DEFAULT)); }
-    catch { res(DEFAULT); }
-  });
+  const DEFAULT = '#00f0ff'; // accent colour — change it here
 
   const sel = (el) => {
     // ponytail: nth-of-type path, no :nth-child math or shortest-selector search.
@@ -31,7 +27,7 @@
   const log = [];
   const ui = document.createElement('div');
   ui.id = '__pk';
-  ui.style.setProperty('--c', c); // one knob: everything below reads from it
+  ui.style.setProperty('--c', DEFAULT); // one knob: everything below reads from it
   ui.innerHTML = `<style>
     #__pk{position:fixed;inset:0;pointer-events:none;z-index:2147483647;font:13px system-ui}
     #__pk *{pointer-events:auto;box-sizing:border-box}
@@ -153,7 +149,7 @@
     const prevOutline = el.style.outline;
     hide();
     el.contentEditable = 'true';
-    el.style.outline = `2px solid ${c}`; // on the element itself, so it tracks reflow as text grows
+    el.style.outline = `2px solid ${DEFAULT}`; // on the element itself, so it tracks reflow as text grows
     el.focus();
     getSelection().selectAllChildren(el); // typing replaces the old text; click once to place a caret instead
     el.addEventListener('blur', () => {

@@ -6,9 +6,8 @@ description: >
   this skill applies those changes to the source. Use when the user says
   /pick, "I picked an element", "picked it", "check the clipboard", or points
   at a change they made by clicking in the UI. Two commands — "/pick init"
-  adds the picker to the current project with no browser install, and "/pick"
-  applies the changes they just made. Also covers the optional browser
-  extension for pages they do not control.
+  adds the picker to the current project, and "/pick" applies the changes they
+  just made. No browser extension, no build step, any stack.
 ---
 
 # Pick
@@ -83,64 +82,20 @@ against this skill's `picker.js`. Identical: say it is already set up and
 stop. Different: the project is on an older picker, so offer to overwrite
 that one file. The loader tag never needs changing.
 
-The accent colour in an initialised project comes from `DEFAULT` at the top
-of its `pick.js` — there is no options page without the extension. Editing
-that constant is the whole mechanism; do not build a settings file for it.
+The accent colour is `DEFAULT` at the top of the project's `pick.js`. Editing
+that constant is the whole mechanism; do not build a settings file or an
+options UI for it.
 
-## The extension — for pages the user does not control
+If the picker misbehaves, pasting `picker.js` straight into the page's
+DevTools console runs the same code without the loader tag involved — useful
+for telling a picker bug from a setup bug.
 
-This skill directory *is* an unpacked Chrome/Edge extension (`manifest.json`,
-`sw.js`, `picker.js`). One click to load, then the picker is on every tab
-forever via the toolbar button or **Alt+Shift+K**. Suggest it for production
-pages, other people's sites, or anything with no local dev server.
+No server, no build step, no dev-dependency, no browser extension. Works on
+any stack because it reads the rendered DOM.
 
-Give them the absolute path of *this skill's own directory* — it differs per
-install (global vs project, Windows vs macOS vs Linux), so resolve it rather
-than quoting a path from this file.
-
-**Chrome / Edge / Brave / Arc** — permanent, survives restarts:
-
-1. `chrome://extensions` (or `edge://extensions`) → **Developer mode** on.
-2. **Load unpacked** → select this skill's directory.
-
-**Firefox** — `about:debugging#/runtime/this-firefox` → **Load Temporary
-Add-on** → select `manifest.json` in that directory. Tell them the catch up
-front: Firefox drops temporary add-ons on restart, so this is a per-session
-load unless the extension is signed through addons.mozilla.org.
-
-The manifest carries both `service_worker` (Chrome) and `scripts` (Firefox)
-background keys. Chrome warns `'background.scripts' requires manifest version
-of 2 or lower` and loads fine. **This warning is correct and expected** —
-specifying both is Mozilla's documented cross-browser recipe, and Firefox has
-never shipped background service workers. Do not "fix" it by dropping a key;
-that silently breaks one of the two browsers. `strict_min_version` is 121.0
-because earlier Firefox refused to start the background page at all when
-`service_worker` was present.
-
-Chrome wins any shortcut conflict and silently leaves the command unbound —
-`chrome://extensions/shortcuts` is where the user reassigns it. The toolbar
-button always works, so never debug a shortcut; point them there.
-
-Edits to `picker.js` are live on next press. Edits to `manifest.json` or
-`sw.js` need the reload arrow on the card at `chrome://extensions`.
-
-The accent colour lives in the extension's options (**Details → Extension
-options**, or the ⋮ menu on the toolbar icon). It is one `chrome.storage.sync`
-key, `color`, read by `picker.js` at launch — no reload needed, just press the
-picker again.
-
-ponytail: the "Load unpacked" click cannot be automated, by design. Snippets
-live in a leveldb store, Bookmarks is checksum-guarded, and force-install
-needs admin registry policy plus a hosted extension. Do not build a
-profile-poking installer — it breaks on Chrome updates and risks their real
-bookmarks. One click, once, is the answer.
-
-If the extension itself misbehaves, pasting `picker.js` into the page's
-DevTools console runs the same code with the extension out of the picture —
-useful for telling a picker bug apart from an extension bug.
-
-No server, no build step, no dev-dependency. Works on any stack because it
-reads the rendered DOM.
+ponytail: there was a browser extension here; `init` made it redundant and it
+was deleted. Do not rebuild one. If someone needs the picker on a page they
+do not control, the console paste above covers it.
 
 ## Notes
 
