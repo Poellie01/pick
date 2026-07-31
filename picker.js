@@ -40,6 +40,8 @@
     @keyframes pkpulse{
       0%,100%{box-shadow:0 0 6px var(--c),0 0 16px var(--c),inset 0 0 8px var(--c);opacity:.8}
       50%{box-shadow:0 0 12px var(--c),0 0 34px var(--c),inset 0 0 14px var(--c);opacity:1}}
+    #__pk .line{position:fixed;display:none;height:3px;background:var(--c);border-radius:2px;pointer-events:none;
+      box-shadow:0 0 8px var(--c),0 0 18px var(--c)}
     #__pk .tb{position:fixed;display:none;gap:2px;background:#080b10;border:1px solid var(--c);border-radius:6px;
       padding:3px;box-shadow:0 0 14px var(--c)}
     #__pk .tb button{background:none;border:0;color:var(--c);font:13px system-ui;padding:3px 8px;cursor:pointer;
@@ -51,16 +53,18 @@
       cursor:pointer;font:13px system-ui;box-shadow:0 0 10px var(--c)}
   </style>
   <div class="box"></div>
+  <div class="line"></div>
   <div class="tb"><button data-a="edit">✎ Edit</button><button data-a="del">🗑 Delete</button><button data-a="move">✥ Move</button></div>
   <div class="bar"><span class="n">Hover an element</span><button data-a="done">Done</button></div>`;
   document.body.append(ui);
   const box = ui.querySelector('.box'), tb = ui.querySelector('.tb'), n = ui.querySelector('.n');
+  const line = ui.querySelector('.line');
   const editBtn = ui.querySelector('[data-a="edit"]');
   // Direct text nodes only: a wrapper whose text all lives in children is not
   // a text element, and making it editable would put the whole subtree in play.
   const hasText = (el) => [...el.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim());
 
-  let cur, moving;
+  let cur, drag;
   const say = (m) => (n.textContent = m || `${log.length} change${log.length === 1 ? '' : 's'}`);
 
   const show = (el) => {
@@ -89,16 +93,49 @@
 
   const click = (e) => {
     const act = e.target.closest?.('#__pk [data-a]')?.dataset.a;
-    if (act) return e.preventDefault(), e.stopPropagation(), run(act);
-    if (moving) { // second click picks the destination
-      e.preventDefault(); e.stopPropagation();
-      if (ui.contains(e.target) || moving.contains(e.target)) return;
-      const before = desc(e.target);
-      e.target.before(moving);
-      log.push(`- **Move** ${desc(moving)} → to just before ${before}`);
-      moving.style.outline = ''; moving = null; say();
+    // 'move' is a drag, handled on pointerdown — swallow its trailing click.
+    if (act) return e.preventDefault(), e.stopPropagation(), act !== 'move' && run(act);
+  };
+
+  // ponytail: pointer events, not HTML5 drag-and-drop. Native DnD fights the
+  // page — links and images drag themselves, and sites cancel dragstart.
+  // No autoscroll: drop targets have to be on screen. Add it if that bites.
+  const grab = (e) => {
+    if (!cur || e.button !== 0 || !e.target.closest?.('[data-a="move"]')) return;
+    e.preventDefault();
+    drag = { src: cur, ref: null, before: false };
+    drag.src.style.opacity = '.4';
+    hide(); // hide() nulls cur, so drag.src is the only handle from here
+    removeEventListener('mouseover', over, true);
+    say('Drag to where it goes — release to drop');
+
+    const move = (ev) => {
+      const t = document.elementFromPoint(ev.clientX, ev.clientY);
+      if (!t || ui.contains(t) || t === drag.src || drag.src.contains(t) || t === document.body) return;
+      const r = t.getBoundingClientRect();
+      drag.ref = t;
+      drag.before = ev.clientY < r.top + r.height / 2; // above the midline drops before
+      Object.assign(line.style, {
+        display: 'block', top: `${(drag.before ? r.top : r.bottom) - 1}px`,
+        left: `${r.left}px`, width: `${r.width}px`,
+      });
+    };
+    const drop = () => {
+      removeEventListener('pointermove', move, true);
+      removeEventListener('pointerup', drop, true);
+      drag.src.style.opacity = '';
+      line.style.display = 'none';
+      if (drag.ref) {
+        const to = desc(drag.ref);
+        drag.before ? drag.ref.before(drag.src) : drag.ref.after(drag.src);
+        log.push(`- **Move** ${desc(drag.src)} → ${drag.before ? 'before' : 'after'} ${to}`);
+      }
+      drag = null;
       addEventListener('mouseover', over, true);
-    }
+      say();
+    };
+    addEventListener('pointermove', move, true);
+    addEventListener('pointerup', drop, true);
   };
 
   const run = (a) => {
@@ -106,11 +143,6 @@
     if (!el) return;
     if (a === 'done') return done();
     if (a === 'del') { log.push(`- **Delete** ${desc(el)}`); el.remove(); hide(); return say(); }
-    if (a === 'move') {
-      moving = el; el.style.outline = `2px dashed ${c}`; hide();
-      removeEventListener('mouseover', over, true); // freeze highlight while aiming
-      return say('Now click where it should go');
-    }
     // edit: contentEditable is the native editor — no custom input, no dialog.
     const was = (el.innerText || '').trim();
     const prevOutline = el.style.outline;
@@ -138,18 +170,21 @@
       () => (console.log(out), alert('Clipboard blocked (insecure page) — copy it from the console.')));
   };
 
-  const key = (e) => e.key === 'Escape' && (moving ? (moving.style.outline = '', moving = null, say(), addEventListener('mouseover', over, true)) : stop());
+  // Esc mid-drag drops the target so the pointerup lands nowhere; otherwise quit.
+  const key = (e) => e.key === 'Escape' && (drag ? (drag.ref = null) : stop());
   const stop = () => {
     clearTimeout(t);
     ui.remove();
     removeEventListener('mouseover', over, true);
     removeEventListener('click', click, true);
+    removeEventListener('pointerdown', grab, true);
     removeEventListener('keydown', key, true);
     delete window.__picker;
   };
 
   addEventListener('mouseover', over, true);
   addEventListener('click', click, true);
+  addEventListener('pointerdown', grab, true);
   addEventListener('keydown', key, true);
   window.__picker = { stop, sel, log };
 })();

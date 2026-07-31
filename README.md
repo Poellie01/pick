@@ -40,7 +40,7 @@ Then press the toolbar button or **Alt+Shift+K** on any page.
 |---|---|
 | **✎ Edit** | Text becomes editable in place. Existing text is selected, so typing replaces it; click once to place a caret instead. Only appears on elements that actually hold text. |
 | **🗑 Delete** | Removes the element. |
-| **✥ Move** | Click the element, then click where it should go. |
+| **✥ Move** | Press and hold, drag to the destination, release. A glowing line shows exactly where it will land — above or below the element you are over. |
 
 Esc cancels. **Done** copies the batch to your clipboard.
 
