@@ -10,6 +10,11 @@ the change in the source.
 hover an element  →  ✎ Edit / 🗑 Delete / ✥ Move  →  Done  →  /pick
 ```
 
+| Command | |
+|---|---|
+| `/pick init` | Add the picker to this project. Once, per project. |
+| `/pick` | Apply the changes you just made in the browser. |
+
 The page updates instantly as a preview. Nothing is written to disk until you
 run `/pick` and the agent applies the batch to your actual source files.
 

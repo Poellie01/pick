@@ -5,9 +5,10 @@ description: >
   hovers any element in their own browser for Edit / Delete / Move buttons;
   this skill applies those changes to the source. Use when the user says
   /pick, "I picked an element", "picked it", "check the clipboard", or points
-  at a change they made by clicking in the UI. Also use for setup — "/pick
-  init" adds the picker to the current project with no browser install, and
-  there is an optional extension for pages they do not control.
+  at a change they made by clicking in the UI. Two commands — "/pick init"
+  adds the picker to the current project with no browser install, and "/pick"
+  applies the changes they just made. Also covers the optional browser
+  extension for pages they do not control.
 ---
 
 # Pick
@@ -16,12 +17,26 @@ The user edits the page directly in their own browser — hover any element,
 press Edit / Delete / Move — then Done copies the list of changes. The page
 edits are only a preview; this skill applies them to the source.
 
-## When invoked
+## Commands
+
+Branch on the argument before doing anything else:
+
+| Invocation | Do |
+|---|---|
+| `/pick init` | **Init** — add the picker to this project. |
+| `/pick`, or anything else | **Apply** — read the clipboard and make the changes. |
+
+Treat "set it up here" or "add pick to this project" as `init` even without
+the word. If `/pick` runs in a project that was never initialised and the
+clipboard holds no pick, offer `init` rather than only reporting an empty
+clipboard.
+
+## Apply
 
 1. Read the clipboard — Windows `Get-Clipboard -Raw`, macOS `pbpaste`, Linux
    `wl-paste` or `xclip -o -selection clipboard`.
 2. If it does not start with `## Change request`, nothing has been picked yet
-   or something else was copied since. Say so, offer setup (below), and stop.
+   or something else was copied since. Say so, offer `init`, and stop.
 3. The payload is a list of `**Edit**` / `**Delete**` / `**Move**` lines, each
    naming a selector and the element's text. Apply every one. Locate each in
    the codebase, in order of what actually works:
@@ -37,13 +52,10 @@ edits are only a preview; this skill applies them to the source.
 
 The whole batch is one clipboard payload, so all changes arrive together.
 
-## Setup
+## Init
 
-Two ways in. Default to the first — it installs nothing in the browser.
-
-### `/pick init` — add it to the project (preferred)
-
-For a site the user controls and runs locally. Do this yourself:
+`/pick init` — add the picker to a site the user controls and runs locally.
+Installs nothing in the browser. Do this yourself:
 
 1. Copy this skill's `picker.js` into wherever the project serves static files
    from — `public/`, `static/`, `assets/`, or beside `index.html` — as
@@ -65,7 +77,10 @@ Each press re-fetches `pick.js`, which re-runs the picker and toggles it —
 which is why `picker.js` stays a bare IIFE with no top-level bindings. Do not
 "tidy" that into a named export.
 
-### The extension — for pages the user does not control
+Re-running `init` must be harmless: if the project already has `pick.js` and
+the loader, say so and stop rather than adding a second copy.
+
+## The extension — for pages the user does not control
 
 This skill directory *is* an unpacked Chrome/Edge extension (`manifest.json`,
 `sw.js`, `picker.js`). One click to load, then the picker is on every tab
