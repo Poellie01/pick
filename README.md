@@ -1,2 +1,72 @@
-# pick
-An AI web development skill removing the need to type prompts for specific changes
+# Pick
+
+**Change a website by clicking the thing you want changed.**
+
+Instead of typing *"the subtitle under the heading in the third pricing card"*,
+you hover it in your own browser, press a button, and your coding agent makes
+the change in the source.
+
+```
+hover an element  →  ✎ Edit / 🗑 Delete / ✥ Move  →  Done  →  /pick
+```
+
+The page updates instantly as a preview. Nothing is written to disk until you
+run `/pick` and the agent applies the batch to your actual source files.
+
+## Install
+
+Two parts: the skill (reads the changes made through clipboard) and the
+extension (DOM overlay in the browser).
+
+**1. The skill**
+
+```
+npx skills add <owner>/<repo>@pick -g
+```
+
+**2. The extension**
+
+- **Chrome / Edge / Brave / Arc** — `chrome://extensions` → enable
+  **Developer mode** → **Load unpacked** → select the skill's folder.
+  Stays installed across restarts.
+- **Firefox** — `about:debugging#/runtime/this-firefox` → **Load Temporary
+  Add-on** → select `manifest.json` in that folder. Firefox 121+.
+  Heads up: Firefox drops temporary add-ons on restart, so this is a
+  per-session load unless the extension is signed through addons.mozilla.org.
+
+Ask your agent for the folder path — it differs between a global and a
+project install.
+
+Then press the toolbar button or **Alt+Shift+K** on any page. If that shortcut
+is taken, `chrome://extensions/shortcuts` lets you pick another; the toolbar
+button always works.
+
+## The three buttons
+
+| | |
+|---|---|
+| **✎ Edit** | Text becomes editable in place. Existing text is selected, so typing replaces it; click once to place a caret instead. Only appears on elements that actually hold text. |
+| **🗑 Delete** | Removes the element. |
+| **✥ Move** | Click the element, then click where it should go. |
+
+Esc cancels. **Done** copies the batch to your clipboard.
+
+## What gets sent
+
+A markdown list — one line per change, each naming a CSS selector and the
+element's visible text, plus the page URL. Nothing else leaves the page. No
+server, no telemetry, no network calls at all.
+
+## Options
+
+Extension **Details → Extension options** sets the accent colour, with a
+native colour picker and six presets. Saves on change; the next launch uses it.
+
+## Requires
+
+An agent that supports skills, e.g. Claude Code. A Chromium browser or
+Firefox 121+.
+
+## License
+
+MIT
