@@ -5,9 +5,9 @@ description: >
   hovers any element in their own browser for Edit / Delete / Move buttons;
   this skill applies those changes to the source. Use when the user says
   /pick, "I picked an element", "picked it", "check the clipboard", or points
-  at a change they made by clicking in the UI. Also use for setup questions —
-  installing the picker extension in Chrome, Edge or Firefox, or its keyboard
-  shortcut.
+  at a change they made by clicking in the UI. Also use for setup — "/pick
+  init" adds the picker to the current project with no browser install, and
+  there is an optional extension for pages they do not control.
 ---
 
 # Pick
@@ -39,9 +39,38 @@ The whole batch is one clipboard payload, so all changes arrive together.
 
 ## Setup
 
+Two ways in. Default to the first — it installs nothing in the browser.
+
+### `/pick init` — add it to the project (preferred)
+
+For a site the user controls and runs locally. Do this yourself:
+
+1. Copy this skill's `picker.js` into wherever the project serves static files
+   from — `public/`, `static/`, `assets/`, or beside `index.html` — as
+   `pick.js`. Read the project to find it; do not guess.
+2. Add this to the dev HTML entry (the root `index.html`, the app template,
+   the layout component — again, read the project):
+
+       <!-- pick: dev only -->
+       <script>addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&e.code==='KeyK'){const s=document.createElement('script');s.src='/pick.js';document.body.append(s);s.onload=()=>s.remove()}})</script>
+
+   Fix the `src` to match where step 1 actually put the file.
+3. **Gate it to development.** Whatever the framework's idiom is — a
+   `NODE_ENV`/`import.meta.env.DEV` conditional, a dev-only template block,
+   a partial that production does not include. Never ship it to production;
+   it lets any visitor rewrite the page. Say which gate was used.
+4. Tell them to reload and press **Alt+Shift+K**.
+
+Each press re-fetches `pick.js`, which re-runs the picker and toggles it —
+which is why `picker.js` stays a bare IIFE with no top-level bindings. Do not
+"tidy" that into a named export.
+
+### The extension — for pages the user does not control
+
 This skill directory *is* an unpacked Chrome/Edge extension (`manifest.json`,
-`sw.js`, `picker.js`). Loading it takes one click, once, and then the picker
-is on every tab forever via the toolbar button or **Alt+Shift+K**.
+`sw.js`, `picker.js`). One click to load, then the picker is on every tab
+forever via the toolbar button or **Alt+Shift+K**. Suggest it for production
+pages, other people's sites, or anything with no local dev server.
 
 Give them the absolute path of *this skill's own directory* — it differs per
 install (global vs project, Windows vs macOS vs Linux), so resolve it rather

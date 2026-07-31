@@ -17,24 +17,34 @@ run `/pick` and the agent applies the batch to your actual source files.
 
 ## Install
 
-Two parts: the skill (so your agent knows what to do with a pick) and the
-extension (so you can pick).
-
 **1. The skill**
 
 ```
 npx skills add Poellie01/pick -g
 ```
 
-**2. The extension**
+**2. Add it to your project**
+
+```
+/pick init
+```
+
+Your agent drops `pick.js` into the project and adds a dev-only script tag,
+gated so it never reaches production. Reload the page, press **Alt+Shift+K**.
+
+Nothing to install in the browser. Works with whatever dev server you already
+run — no build step, no dependency, no extension.
+
+### Optional: the extension
+
+For pages you *don't* control — production, someone else's site, anything
+without a local dev server:
 
 - **Chrome / Edge / Brave / Arc** — `chrome://extensions` → enable
   **Developer mode** → **Load unpacked** → select the skill's folder.
-  
-Ask your agent for the folder path — it differs between a global and a
-project install.
 
-Then press the toolbar button or **Alt+Shift+K** on any page. 
+Ask your agent for the folder path — it differs between a global and a
+project install. Then use the toolbar button or **Alt+Shift+K** on any page.
 
 ## The three buttons
 
