@@ -15,8 +15,8 @@ run `/pick` and the agent applies the batch to your actual source files.
 
 ## Install
 
-Two parts: the skill (reads the changes made through clipboard) and the
-extension (DOM overlay in the browser).
+Two parts: the skill (so your agent knows what to do with a pick) and the
+extension (so you can pick).
 
 **1. The skill**
 
@@ -24,7 +24,7 @@ extension (DOM overlay in the browser).
 npx skills add <owner>/<repo>@pick -g
 ```
 
-**2. The extension**
+**2. The extension** — one click, once. The skill folder *is* the extension.
 
 - **Chrome / Edge / Brave / Arc** — `chrome://extensions` → enable
   **Developer mode** → **Load unpacked** → select the skill's folder.
@@ -61,6 +61,22 @@ server, no telemetry, no network calls at all.
 
 Extension **Details → Extension options** sets the accent colour, with a
 native colour picker and six presets. Saves on change; the next launch uses it.
+
+## Limitations
+
+Worth knowing before you install, not after:
+
+- **It reads the DOM, not your source.** That is why it works on any stack
+  with zero project config — and also why it hands the agent text and
+  selectors to grep rather than an exact `file:line`. Tools like LocatorJS or
+  react-dev-inspector give you the exact file, at the cost of a build plugin
+  and framework lock-in.
+- **Rendered output, not origin.** If an element's text comes from a loop or
+  a CMS field, the agent has to trace it back to the data. It is told to do
+  that, but a distinctive string helps it land in the right place.
+- **Page edits vanish on reload.** They are a preview. The clipboard log is
+  the record.
+- **One batch at a time** — the clipboard holds the most recent Done.
 
 ## Requires
 
