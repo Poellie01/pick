@@ -40,17 +40,6 @@ gated so it never reaches production. Reload the page, press **Alt+Shift+K**.
 Nothing to install in the browser. Works with whatever dev server you already
 run — no build step, no dependency, no extension.
 
-### Optional: the extension
-
-For pages you *don't* control — production, someone else's site, anything
-without a local dev server:
-
-- **Chrome / Edge / Brave / Arc** — `chrome://extensions` → enable
-  **Developer mode** → **Load unpacked** → select the skill's folder.
-
-Ask your agent for the folder path — it differs between a global and a
-project install. Then use the toolbar button or **Alt+Shift+K** on any page.
-
 ## The three buttons
 
 | | |
@@ -72,8 +61,6 @@ server, no telemetry, no network calls at all.
 The accent colour is cyan by default.
 
 - **In a project** — change `DEFAULT` at the top of your `pick.js`.
-- **With the extension** — **Details → Extension options**, a native colour
-  picker plus six presets. Saves on change; the next launch uses it.
 
 ## Updating
 
@@ -84,8 +71,7 @@ when you want the newer picker.
 ## Requires
 
 An agent that supports skills, e.g. Claude Code. Any modern browser: the
-project setup is plain JavaScript. The optional extension needs Chrome, Edge,
-Brave, Arc, or Firefox 121+.
+project setup is plain JavaScript. 
 
 ## License
 
